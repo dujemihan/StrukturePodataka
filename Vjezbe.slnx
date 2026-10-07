@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Prva/">
+    <Project Path="Zad1/Zad1.vcxproj" />
+  </Folder>
+</Solution>
