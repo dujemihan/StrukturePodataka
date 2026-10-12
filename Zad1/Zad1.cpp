@@ -46,7 +46,7 @@ int countStudents(char const* const fileName)
 	return ret;
 }
 
-int loadAndPrintStudents(char const * const fileName, int count, student_t* students)
+int loadAndPrintStudents(char const * const fileName, int const count, student_t* const students)
 {
 	FILE* fp = NULL;
 	errno_t err = 0;
