@@ -2,29 +2,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BUF_SIZE 100
-#define NAME_SIZE 20
-#define MAX_POINTS 50
+/* Magic numbers */
+#define BUF_SIZE (100)
+#define NAME_SIZE (20)
+#define MAX_POINTS (50)
+
+/* Custom errors */
+#define FILE_ERROR (1)
 
 typedef struct student {
-	char ime[NAME_SIZE];
-	char prezime[NAME_SIZE];
-	int bodovi;
+	char name[NAME_SIZE];
+	char surname[NAME_SIZE];
+	int score;
 } student_t;
 
-int count_students(FILE* fp)
+int countStudents(char const* const fileName)
 {
-	char* buf = (char*) calloc(BUF_SIZE, sizeof(*buf));
+	char* buf = NULL;
+	FILE* fp = NULL;
 	int ret = 0;
+	errno_t err = 0;
 
+	buf = (char*)calloc(BUF_SIZE, sizeof(*buf));
 	if (!buf) {
+		perror("countStudents: greska pri alokaciji");
 		free(buf);
-		return -1;
+		return err;
 	}
 
-	errno_t err = fseek(fp, 0, SEEK_SET);
+	err = fopen_s(&fp, fileName, "r");
 	if (err) {
-		perror("Nisam se uspio vratiti na pocetak");
+		perror("Greska pri otvaranju datoteke");
 		return err;
 	}
 
@@ -34,63 +42,62 @@ int count_students(FILE* fp)
 	}
 
 	free(buf);
+	fclose(fp);
 	return ret;
 }
 
-int load_print_students(FILE* fp, int n, student_t **ret)
+int loadAndPrintStudents(char const * const fileName, int count, student_t* students)
 {
-	student_t *studenti = (student_t*) calloc(n, sizeof(*studenti));
-	errno_t err;
+	FILE* fp = NULL;
+	errno_t err = 0;
 
-	if (!studenti) {
-		perror("Greska pri alokaciji memorije");
-		free(studenti);
-		return -1;
-	}
-
-	err = fseek(fp, 0, SEEK_SET);
+	err = fopen_s(&fp, fileName, "r");
 	if (err) {
-		perror("Nisam se uspio vratiti na pocetak");
+		perror("loadAndPrintStudents: Greska pri otvaranju datoteke");
 		return err;
 	}
 
-	for (int i = 0; i < n; i++) {
-		int c = fscanf_s(fp, "%s %s %d",
-			studenti[i].ime, NAME_SIZE, studenti[i].prezime, NAME_SIZE, &studenti[i].bodovi);
-		if (c < 3) {
-			printf("Greska u datoteci!\n");
-			return -1;
+	for (int i = 0; i < count; i++) {
+		int numColumns = fscanf_s(fp, "%s %s %d",
+			students[i].name, NAME_SIZE, students[i].surname, NAME_SIZE, &students[i].score);
+		if (numColumns < 3) {
+			return FILE_ERROR;
 		}
 
-		printf("Student: %s %s, %d bodova (%d%%)\n", studenti[i].prezime, studenti[i].ime, studenti[i].bodovi, studenti[i].bodovi * 100 / MAX_POINTS);
+		printf("Student: %s %s, %d bodova (%d%%)\n", students[i].surname, students[i].name, students[i].score, students[i].score * 100 / MAX_POINTS);
 	}
 
-	*ret = studenti;
+	fclose(fp);
 	return 0;
 }
 
 int main()
 {
-	student_t* studenti;
-	FILE* fp;
-	int n;
+	student_t* students = NULL;
+	int count = 0;
+	errno_t err = 0;
 
-	errno_t err = fopen_s(&fp, "popis.txt", "r");
-	if (err) {
-		perror("Nisam uspio otvoriti datoteku");
-		return err;
+	count = countStudents("popis.txt");
+	if (count < 0) {
+		return count;
 	}
 
-	n = count_students(fp);
-	if (n < 0) {
-		return n;
+	students = (student_t*)calloc(count, sizeof(*students));
+	if (!students) {
+		perror("main: Greska pri alokaciji");
+		return errno;
 	}
 
-	err = load_print_students(fp, n, &studenti);
-	if (err) {
-		return err;
+	switch (loadAndPrintStudents("popis.txt", count, students)) {
+	case 0:
+		break;
+	case FILE_ERROR:
+		printf("%s: Greska pri ucitavanju studenata %d\n", __func__, FILE_ERROR);
+		break;
+	default:
+		perror("main: Sistemska greska pri ucitavanju studenata");
 	}
 
-	free(studenti);
+	free(students);
 	return 0;
 }

@@ -4,6 +4,6 @@
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/Prva/">
-    <Project Path="Zad1/Zad1.vcxproj" />
+    <Project Path="Zad1/Zad1.vcxproj" Id="cde24e53-8f50-4ce3-be1c-4c1dc11225ce" />
   </Folder>
 </Solution>
