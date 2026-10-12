@@ -10,6 +10,8 @@
 /* Custom errors */
 #define FILE_ERROR (1)
 
+#define PERROR(e) perror(__FUNCTION__ ": " e)
+
 typedef struct student {
 	char name[NAME_SIZE];
 	char surname[NAME_SIZE];
@@ -25,15 +27,15 @@ int countStudents(char const* const fileName)
 
 	buf = (char*)calloc(BUF_SIZE, sizeof(*buf));
 	if (!buf) {
-		perror("countStudents: greska pri alokaciji");
+		PERROR("Greska pri alokaciji");
 		free(buf);
-		return err;
+		return -errno;
 	}
 
 	err = fopen_s(&fp, fileName, "r");
 	if (err) {
-		perror("Greska pri otvaranju datoteke");
-		return err;
+		PERROR("Greska pri otvaranju datoteke");
+		return -err;
 	}
 
 	while (!feof(fp)) {
@@ -53,8 +55,8 @@ int loadAndPrintStudents(char const * const fileName, int const count, student_t
 
 	err = fopen_s(&fp, fileName, "r");
 	if (err) {
-		perror("loadAndPrintStudents: Greska pri otvaranju datoteke");
-		return err;
+		PERROR("Greska pri otvaranju datoteke");
+		return -err;
 	}
 
 	for (int i = 0; i < count; i++) {
@@ -78,26 +80,26 @@ int main()
 	errno_t err = 0;
 
 	count = countStudents("popis.txt");
-	if (count < 0) {
+	if (count < 0)
 		return count;
-	}
 
 	students = (student_t*)calloc(count, sizeof(*students));
 	if (!students) {
-		perror("main: Greska pri alokaciji");
-		return errno;
+		PERROR("Greska pri alokaciji");
+		return -errno;
 	}
 
-	switch (loadAndPrintStudents("popis.txt", count, students)) {
+	err = loadAndPrintStudents("popis.txt", count, students);
+	switch (err) {
 	case 0:
 		break;
 	case FILE_ERROR:
-		printf("%s: Greska pri ucitavanju studenata %d\n", __func__, FILE_ERROR);
+		printf("%s: Greska pri ucitavanju studenata: %d\n", __func__, FILE_ERROR);
 		break;
 	default:
-		perror("main: Sistemska greska pri ucitavanju studenata");
+		PERROR("Sistemska greska pri ucitavanju studenata");
 	}
 
 	free(students);
-	return 0;
+	return err;
 }
