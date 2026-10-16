@@ -28,6 +28,10 @@ int main()
         return -err;
     }
 
+    err = listAppend(head, &b);
+    if (err) {
+        printf("Failed to insert element: %d\n", err);
+    }
     err = listInsert(head, &a);
     if (err) {
         printf("Failed to insert element: %d\n", err);

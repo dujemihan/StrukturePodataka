@@ -48,7 +48,7 @@ errno_t listInsert(node* const head, student const* const data);
 /// <returns>0 on success, errno otherwise</returns>
 errno_t listAppend(node* const head, student const* const data);
 /// <summary>
-/// Searches for a surname in the list
+/// Searches for first occurence of a surname in the list
 /// </summary>
 /// <param name="result">Pointer to pointer where result will be stored</param>
 /// <param name="head">Pointer to list</param>
@@ -56,7 +56,7 @@ errno_t listAppend(node* const head, student const* const data);
 /// <returns>0 if found, NOT_FOUND otherwise</returns>
 errno_t listFindSurname(node** result, node* const head, char const* const surname);
 /// <summary>
-/// Remove an element from a list
+/// Removes first occurence of an element from a list
 /// </summary>
 /// <param name="head">Pointer to target list</param>
 /// <param name="target">Pointer to data to search for and remove</param>

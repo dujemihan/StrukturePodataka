@@ -60,24 +60,12 @@ errno_t listInsert(node* const head, student const * const data)
 
 errno_t listAppend(node* const head, student const* const data)
 {
-    node* after = head->next;
-    node* _new = NULL;
-    errno_t err = 0;
+    node* after = head->next ? head->next : head;
 
     while (after->next)
         after = after->next;
 
-    _new = (node*)calloc(1, sizeof(*_new));
-    if (!_new)
-        return errno;
-
-    err = memcpy_s(&_new->data, sizeof(_new->data), data, sizeof(*data));
-    if (!err) {
-        _new->next = NULL;
-        after->next = _new;
-    }
-
-    return err;
+    return listInsert(after, data);
 }
 
 errno_t listFindSurname(node** result, node* const head, char const* const surname)
