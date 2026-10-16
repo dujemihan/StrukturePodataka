@@ -6,4 +6,5 @@
   <Folder Name="/Prva/">
     <Project Path="Zad1/Zad1.vcxproj" Id="cde24e53-8f50-4ce3-be1c-4c1dc11225ce" />
   </Folder>
+  <Project Path="Zad2/Zad2.vcxproj" Id="b2366a2a-ec4c-4751-93a0-b731bd5c83c3" />
 </Solution>
