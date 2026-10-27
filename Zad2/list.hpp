@@ -3,9 +3,13 @@
 
 #include <stdint.h>
 
-#define NOT_FOUND   (1)
+#define NOT_FOUND   (-1)
+#define BAD_FILE    (-2)
 
 #define NAME_LEN    (20)
+    
+#define DELIM ','
+#define FILE_HEADER "surname,name,year\n"
 
 /// <summary>
 /// A student
@@ -68,5 +72,10 @@ errno_t listRemove(node* const head, student const *const target);
 /// <param name="head">Pointer to target list</param>
 /// <returns>Number of printed elements</returns>
 int listPrintAll(node* const head);
+errno_t listInsertBefore(node* const head, student const* const data, student const* const before);
+errno_t listInsertAfter(node* const head, student const* const data, student const* const after);
+int listSortAscending(node* const head);
+int listSave(node const *head, char const* const filename);
+int listLoad(node** head, char const* const filename);
 
 #endif
