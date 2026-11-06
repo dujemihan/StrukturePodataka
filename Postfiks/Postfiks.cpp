@@ -7,7 +7,7 @@
 
 #include "list.hpp"
 
-//#define ENABLE_DEBUG
+#define ENABLE_DEBUG
 #ifdef ENABLE_DEBUG
 #define DEBUG(fmt, ...)	fprintf(stderr, "%s.%d: " fmt, __FILE__, __LINE__, __VA_ARGS__)
 #else
@@ -17,18 +17,44 @@
 static int printNumber(int const data);
 static int printOperator(int const data);
 
-int main()
+int main(int argc, char* argv[])
 {
-	char test[] = "15 7 1 1 + - / 3 * 2 4 ^ + -5 +";
+	char* buffer = NULL;
+	char* filename = argv[1];
 	node* numbers = newNode(0);
 	char* ctx = NULL;
+	FILE* fp = NULL;
+	size_t length = 0;
 	errno_t err = 0;
 	long result = 0;
 
 	if (!numbers)
 		return -ENOMEM;
 
-	for(char* token = strtok_s((char*)test, " ", &ctx); token; token = strtok_s(NULL, " ", &ctx)) {
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+		return -EINVAL;
+	}
+
+	err = fopen_s(&fp, filename, "r");
+	if (err) {
+		fprintf(stderr, "Error opening file %s\n", filename);
+		return -err;
+	}
+
+	fseek(fp, 0, SEEK_END);
+	length = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	buffer = (char*)calloc(length + 1, sizeof(*buffer));
+	if (!buffer) {
+		fclose(fp);
+		return -ENOMEM;
+	}
+	fread(buffer, sizeof(*buffer), length, fp);
+	fclose(fp);
+	
+	for(char* token = strtok_s(buffer, " ", &ctx); token; token = strtok_s(NULL, " ", &ctx)) {
 		char* end = NULL;
 		long number = strtol(token, &end, 0);
 
